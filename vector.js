@@ -26,6 +26,10 @@ class Vector {
         return res
     }
 
+    static distance(v1,v2) {
+        return Math.sqrt(Math.pow(v2.x-v1.x,2) + Math.pow(v2.y-v1.y,2))
+    }
+
     magnitude() {
         return Math.sqrt(this.x*this.x + this.y*this.y)
     }

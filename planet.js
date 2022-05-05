@@ -1,10 +1,11 @@
 class Planet {
-    constructor(x, y, velocityX, velocityY, mass) {
+    constructor(x, y, velocityX, velocityY, mass, movable) {
         this.position = new Vector(x,y)
         this.velocity = new Vector(velocityX,velocityY)
         this.mass = mass
         this.radius = Math.log2(mass+1)*2
         this.color = 'rgb(' + Math.random()*256 +', ' + Math.random()*256+', ' + Math.random()*256 + ')'
+        this.movable = movable
     }
 
     changeVelocity(velocityX, velocityY) {
@@ -12,8 +13,9 @@ class Planet {
     }
 
     draw() {
-        this.position = Vector.add(this.position,this.velocity)
-
+        if (this.movable) {
+            this.position = Vector.add(this.position,this.velocity)
+        }
         var c = canvas.getContext('2d');
         c.beginPath()
         c.arc(this.position.x,this.position.y,this.radius,0,Math.PI*2,false)
