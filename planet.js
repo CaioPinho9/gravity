@@ -3,7 +3,7 @@ class Planet {
         this.position = new Vector(x,y)
         this.velocity = new Vector(velocityX,velocityY)
         this.mass = mass
-        this.radius = Math.log2(mass+1)*5
+        this.radius = Math.log2(mass+1)*2
         this.color = 'rgb(' + Math.random()*256 +', ' + Math.random()*256+', ' + Math.random()*256 + ')'
     }
 
@@ -20,5 +20,21 @@ class Planet {
         c.fillStyle = this.color
         c.fill()
         c.closePath
+    }
+
+    borderColision(width,height) {
+        if (this.position.x <= this.radius && this.velocity.x < 0) {
+            this.velocity.x = -this.velocity.x
+        }
+        if (this.position.y <= this.radius && this.velocity.y < 0) {
+            this.velocity.y = -this.velocity.y
+        }
+        if (this.position.x >= width-this.radius && this.velocity.x > 0) {
+            this.velocity.x = -this.velocity.x
+        }
+        if (this.position.y >= height-this.radius && this.velocity.y > 0) {
+            this.velocity.y = -this.velocity.y
+        }
+
     }
 }
