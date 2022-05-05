@@ -6,6 +6,7 @@ class Planet {
         this.radius = Math.log2(mass+1)*2
         this.color = 'rgb(' + Math.random()*256 +', ' + Math.random()*256+', ' + Math.random()*256 + ')'
         this.movable = movable
+        this.trail = new Array(500);
     }
 
     changeVelocity(velocityX, velocityY) {
@@ -15,8 +16,23 @@ class Planet {
     draw() {
         if (this.movable) {
             this.position = Vector.add(this.position,this.velocity)
+            this.trail.unshift(this.position)
+            if (this.trail.length >= 500) {
+                this.trail.splice(-1,1)
+            }
         }
+        //trail
         var c = canvas.getContext('2d');
+        c.beginPath()
+        c.moveTo(this.position.x,this.position.y);
+        this.trail.forEach(position => {
+            c.lineTo(position.x,position.y);
+        });
+        c.strokeStyle = this.color;
+        c.stroke();
+        c.closePath
+
+        //planet
         c.beginPath()
         c.arc(this.position.x,this.position.y,this.radius,0,Math.PI*2,false)
         c.fillStyle = this.color
