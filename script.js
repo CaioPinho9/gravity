@@ -41,6 +41,7 @@ canvas.addEventListener('mousedown', function(event) {
         var x = event.clientX - rect.left;
         var y = event.clientY - rect.top;
         startPoint = new Vector(x,y)
+        endPoint = new Vector(x,y)
         createPlanet(x,y,slider.value,false)
         buildLine = true;
     }, 100);
