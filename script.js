@@ -11,11 +11,14 @@ internalDiv.style.width = (div.clientWidth/1.9) + 'px';
 internalDiv.style.height = (div.clientHeight/1.60 + 'px');
 
 var planetList = new Array();
+var staticPlanetList = new Array();
 var c = canvas.getContext('2d');
 var mouseHoldTimeout;
 var mouseDownDone = false;
+var staticPlanet = false;
 
 canvas.addEventListener('click', function(event) {
+    staticPlanetCheck()
     if (mouseHoldTimeout) {
         clearTimeout(mouseHoldTimeout);
         mouseHoldTimeout = null;
@@ -27,14 +30,14 @@ canvas.addEventListener('click', function(event) {
     var rect = canvas.getBoundingClientRect();
     var x = event.clientX - rect.left;
     var y = event.clientY - rect.top;
-    createPlanet(x,y,slider.value,true)
+    createPlanet(x,y,slider.value,!staticPlanet)
 }, false);
 
 var startPoint = new Vector(0,0);
 var endPoint = new Vector(0,0);
 var buildLine;
 
-canvas.addEventListener('mousedown', function(event) {
+canvas.addEventListener('mousedown', function(event) {   
     mouseHoldTimeout = setTimeout(() => {
         mouseDownDone = true;
         var rect = canvas.getBoundingClientRect();
@@ -55,6 +58,7 @@ canvas.addEventListener('mousemove', function(event) {
 }, false);
 
 canvas.addEventListener('mouseup', function(event) {
+    staticPlanetCheck()
     if (buildLine) {
         var distanceX = endPoint.x-startPoint.x
         var distanceY = endPoint.y-startPoint.y
@@ -62,32 +66,56 @@ canvas.addEventListener('mouseup', function(event) {
         var velocityY = distanceY/50
         startPoint = new Vector(0,0)
         endPoint = new Vector(0,0)
+        planetList[planetList.length-1].movable = !staticPlanet;
         planetList[planetList.length-1].changeVelocity(velocityX,velocityY)
-        planetList[planetList.length-1].movable = true;
         buildLine = false;
     }
 }, false);
     
+function staticPlanetCheck() {
+    if (document.getElementById("static").checked) {
+        staticPlanet = true;
+    } else {
+        staticPlanet = false;
+    }
+}
 
 function createPlanet(x,y,mass,movable) {
     var planet = new Planet(x,y,0,0,mass,movable)
     planetList.push(planet)
+    
+    if (staticPlanet) {
+        staticPlanetList.push(planet)
+    }
 }
 
-function moveRandom(planet) {
-    var signal = Math.floor(Math.random()*2+1)
-    if (signal == 2) {
-        signal = 1
-    } else {
-        signal = -1
-    }
-    planet.changeVelocity(Math.random()*signal/5, Math.random()*signal/5)
+function gravity(planet) {
+    staticPlanetList.forEach(staticPlanet => {
+        if (planet.movable === true) {
+        planet.ballCollision(staticPlanet)
+        var mass1 = planet.mass
+        var mass2 = staticPlanet.mass
+        var g = 6.67408 * Math.pow(-10,-1)
+
+        var dirForce = (Vector.substract(planet.position,staticPlanet.position))
+        dirForce = Vector.normalize(dirForce)
+
+        var force = ((mass1*mass2*10)/Math.pow(Vector.distance(planet.position,staticPlanet.position),2))*g
+        var accelerationX = (Vector.multiply(dirForce,force).x)/mass1
+        var accelerationY = (Vector.multiply(dirForce,force).y)/mass1
+
+        planet.changeVelocity(accelerationX,accelerationY)
+
+        }
+    })
 }
 
 function draw() {
     c.clearRect(0,0,canvas.width,canvas.height)
     planetList.forEach(planet => {
-        planet.borderColision(canvas.width, canvas.height)
+        gravity(planet)
+        var wallCollision = document.getElementById("wall").checked;
+        planet.borderCollision(canvas.width, canvas.height, wallCollision)
         planet.draw()
     });
 }

@@ -10,7 +10,9 @@ class Planet {
     }
 
     changeVelocity(velocityX, velocityY) {
-        this.velocity = Vector.add(this.velocity,new Vector(velocityX,velocityY))
+        if (this.movable) {
+            this.velocity = Vector.add(this.velocity,new Vector(velocityX,velocityY))
+        }
     }
 
     draw() {
@@ -40,19 +42,35 @@ class Planet {
         c.closePath
     }
 
-    borderColision(width,height) {
-        if (this.position.x <= this.radius && this.velocity.x < 0) {
-            this.velocity.x = -this.velocity.x
+    ballCollision(staticPlanet) {
+        var distance = Vector.distance(this.position,staticPlanet.position)
+        if (distance <= this.radius+staticPlanet.radius) {
+            staticPlanet.mass =  Number(staticPlanet.mass)+Number(this.mass)
+            staticPlanet.radius = staticPlanet.radius+Math.log2(staticPlanet.mass)/2
+            this.destroy()
         }
-        if (this.position.y <= this.radius && this.velocity.y < 0) {
-            this.velocity.y = -this.velocity.y
-        }
-        if (this.position.x >= width-this.radius && this.velocity.x > 0) {
-            this.velocity.x = -this.velocity.x
-        }
-        if (this.position.y >= height-this.radius && this.velocity.y > 0) {
-            this.velocity.y = -this.velocity.y
-        }
+    }
 
+    destroy() {
+        this.color = "rgba(0,0,0,0)"
+        this.movable = false;
+        this.position = new Vector(2000,2000)
+    }
+
+    borderCollision(width,height,wallCollision) {
+        if (wallCollision){
+            if (this.position.x <= this.radius && this.velocity.x < 0) {
+                this.velocity.x = -this.velocity.x
+            }
+            if (this.position.y <= this.radius && this.velocity.y < 0) {
+                this.velocity.y = -this.velocity.y
+            }
+            if (this.position.x >= width-this.radius && this.velocity.x > 0) {
+                this.velocity.x = -this.velocity.x
+            }
+            if (this.position.y >= height-this.radius && this.velocity.y > 0) {
+                this.velocity.y = -this.velocity.y
+            }
+        }
     }
 }
