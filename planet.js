@@ -7,6 +7,7 @@ class Planet {
         this.color = 'rgb(' + Math.random()*256 +', ' + Math.random()*256+', ' + Math.random()*256 + ')'
         this.movable = movable
         this.trail = new Array(500);
+        this.destroyed = false;
     }
 
     changeVelocity(velocityX, velocityY) {
@@ -24,15 +25,18 @@ class Planet {
             }
         }
         //trail
+        
         var c = canvas.getContext('2d');
-        c.beginPath()
-        c.moveTo(this.position.x,this.position.y);
-        this.trail.forEach(position => {
-            c.lineTo(position.x,position.y);
-        });
-        c.strokeStyle = this.color;
-        c.stroke();
-        c.closePath
+        if (document.getElementById('trail').checked) {
+            c.beginPath()
+            c.moveTo(this.position.x,this.position.y);
+            this.trail.forEach(position => {
+                c.lineTo(position.x,position.y);
+            });
+            c.strokeStyle = this.color;
+            c.stroke();
+            c.closePath
+        }
 
         //planet
         c.beginPath()
@@ -44,17 +48,21 @@ class Planet {
 
     ballCollision(staticPlanet) {
         var distance = Vector.distance(this.position,staticPlanet.position)
-        if (distance <= this.radius+staticPlanet.radius) {
-            staticPlanet.mass =  Number(staticPlanet.mass)+Number(this.mass)
-            staticPlanet.radius = staticPlanet.radius+Math.log2(staticPlanet.mass)/2
+        if (distance <= this.radius+staticPlanet.radius && this.mass <= staticPlanet.mass) {
+            if (document.getElementById('merge').checked) {
+                staticPlanet.mass =  Number(staticPlanet.mass)+Number(this.mass)
+                staticPlanet.radius = staticPlanet.radius+Math.log2(staticPlanet.mass)/2
+            }
             this.destroy()
         }
     }
 
     destroy() {
+        this.mass = 0
         this.color = "rgba(0,0,0,0)"
         this.movable = false;
         this.position = new Vector(2000,2000)
+        this.destroyed = true;
     }
 
     borderCollision(width,height,wallCollision) {
