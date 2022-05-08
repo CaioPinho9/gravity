@@ -36,7 +36,7 @@ canvas.addEventListener('click', function(event) {
         createPlanet(x,y,slider.value,!staticPlanet)
     } else {
         planetList.forEach(planet => {
-            planet.ballCollision(new Planet(x,y,0,0,1,false))
+            planet.ballCollision(new Planet(x,y,0,0,100000,false))
         });
     }
 }, false);
